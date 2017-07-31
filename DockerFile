@@ -1,0 +1,32 @@
+FROM openjdk:8-alpine
+
+ENV JMETER_VERSION 3.2
+RUN export HTTP_PROXY=http://10.15.206.38:8080
+RUN export HTTPS_PROXY=https://10.15.206.38:8080
+# Install Pre-requisite Packages
+RUN apk add --update --no-cache python python-dev py-pip wget unzip
+
+# Installing robot framework
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  robotframework robotframework-selenium2library selenium
+
+#RUN pip install robotframework robotframework-selenium2library selenium
+
+# Installing jmeter
+RUN   mkdir /jmeter \
+        && cd /jmeter/ \
+        && wget  -e "https_proxy=10.15.206.38:8080"  https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.tgz \
+        && tar -xzf apache-jmeter-$JMETER_VERSION.tgz \
+    && rm apache-jmeter-$JMETER_VERSION.tgz
+
+# Settingt Jmeter Home
+ENV JMETER_HOME /jmeter/apache-jmeter-$JMETER_VERSION/
+
+# Finally Adding Jmeter to the Path
+ENV PATH $JMETER_HOME/bin:$PATH
+
+# Workspace
+RUN mkdir /test
+WORKDIR /test
+
+# Autoexec command
+CMD ["sh"]
